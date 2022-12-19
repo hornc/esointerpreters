@@ -15,7 +15,7 @@ SEP = '\n👣\n'
 
 def loadfile(filename):
     with open(filename, 'r') as f:
-        return [[int(REF.sub(lambda m: '-' * ('end' in m[0]), v)) for v in line.strip().split(',') if v] for line in f]
+        return [[int(REF.sub(lambda m: '-' * ('end' in m[0]), v)) - ('end' in v) for v in line.strip().split(',') if v] for line in f]
 
 
 def run(rows):
