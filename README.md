@@ -8,3 +8,4 @@ Assorted esolang interpreters written by me for various languages on esolangs.or
 | [G_arD^EN CorUtY@rD](https://esolangs.org/wiki/G_arD%5EEN_CorUtY@rD) | BoundedBeans | 2022 | [gc.py](G_arD%5EEN%20CorUtY%40rD/) | 2022 |
 | [Esme](https://esolangs.org/wiki/Esme) | Dagoth Ur, Mad God | 2008 | [esme.pl](esme/) | 2019 |
 | [ඞlang](https://esolangs.org/wiki/%E0%B6%9Elang) | Yes | 2022 | [sus.esme](esme/examples/sus.esme) | 2022 |
+| [Footsteps](https://esolangs.org/wiki/Footsteps) | ais523 | 2017 | [footsteps.py](footsteps/) | 2022 |
