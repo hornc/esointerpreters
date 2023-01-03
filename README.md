@@ -9,3 +9,4 @@ Assorted esolang interpreters written by me for various languages on esolangs.or
 | [Esme](https://esolangs.org/wiki/Esme) | Dagoth Ur, Mad God | 2008 | [esme.pl](esme/) | 2019 |
 | [ඞlang](https://esolangs.org/wiki/%E0%B6%9Elang) | Yes | 2022 | [sus.esme](esme/examples/sus.esme) | 2022 |
 | [Footsteps](https://esolangs.org/wiki/Footsteps) | ais523 | 2017 | [footsteps.py](footsteps/) | 2022 |
+| [Seed](https://esolangs.org/wiki/Seed) | Xp(?) | 2009 | [seed.rb](Seed/) | 2021 |
