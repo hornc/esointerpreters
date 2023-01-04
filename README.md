@@ -10,3 +10,4 @@ Assorted esolang interpreters written by me for various languages on esolangs.or
 | [ඞlang](https://esolangs.org/wiki/%E0%B6%9Elang) | Yes | 2022 | [sus.esme](esme/examples/sus.esme) | 2022 |
 | [Footsteps](https://esolangs.org/wiki/Footsteps) | ais523 | 2017 | [footsteps.py](footsteps/) | 2022 |
 | [Seed](https://esolangs.org/wiki/Seed) | Xp(?) | 2009 | [seed.rb](Seed/) | 2021 |
+| [Barely](https://esolangs.org/wiki/Barely) | Calamari | 2006 | [barely.py](Barely/) | 2023 |
