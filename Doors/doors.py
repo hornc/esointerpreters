@@ -23,17 +23,18 @@ class Player:
 
 def run(doors, p):
     running = True
-    ptr = 0
+    ptr = 1  # ptr is 1 based index
     while running:
-        c, v = doors[ptr]
+        c, v = doors[ptr - 1]
         ptr += p.direction
         #print('ENTITY:', c)
         if c == 'v':  # void, teleport to door v
-            ptr = v - 1
+            ptr = v
+            #print(f'Jump to {DOOR} {ptr}')
         elif c == 'e':  # eyes, input
             eyes = list(EYES)
             shuffle(eyes)  # TODO: this isn't as succesful as I hoped...
-            in_ = input(''.join(eyes))
+            in_ = input(''.join(eyes) + ' ')
             if in_:
                 p.value = ord(in_[0])
             else:
@@ -63,8 +64,9 @@ def run(doors, p):
             ptr = p.value
         elif c == 'G':
             p.value = v
+            #print(f'Player value = {p.value}')
 
-        if ptr < 0 or ptr >= len(doors) or c == 'h':
+        if ptr < 1 or ptr > len(doors) or c == 'h':
             running = False 
 
 
@@ -80,12 +82,19 @@ def main():
 
     doors = []  # list of numbered doors
     entities, values = source.split('\n')[:2]
-    print(entities, values)
+    #print(entities, values)
 
-    for i, entity in enumerate(entities):
-        doors.append((entity, int(values[i]) if values[i].strip() else None))
+    i = 0
+    for entity in entities:
+        if entity.strip():
+            doors.append((entity, int(values[i]) if values[i].strip() else None))
+        elif values[i].strip():
+            prev = doors[i-1]
+            doors[i-1] = (prev[0], prev[1] * 10 + int(values[i]))
+        i += 1
 
-    print(doors)
+    print('ROOMS:' + ''.join([f'{DOOR}{i+1}{d}' for i,d in enumerate(doors)]) + '\n')
+
     player = Player()
     run(doors, player)
 
