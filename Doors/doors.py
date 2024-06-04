@@ -40,8 +40,10 @@ def run(doors, p, character_output=False):
                 except EOFError:
                     in_ = '\x00'  # EOF
             if in_:
-                 p.value = ord(in_[0])
-                 in_ = in_[1:]
+                p.value = ord(in_[0])
+                in_ = in_[1:]
+            else:
+                p.value = 0x0A  # newline
         elif c == 't':
             if character_output:
                 print(chr(p.value), end='')
