@@ -24,19 +24,24 @@ class Player:
 def run(doors, p):
     running = True
     ptr = 1  # ptr is 1 based index
+    in_ = ''
     while running:
         c, v = doors[ptr - 1]
         ptr += p.direction
-        #print('ENTITY:', c)
         if c == 'v':  # void, teleport to door v
             ptr = v
             #print(f'Jump to {DOOR} {ptr}')
         elif c == 'e':  # eyes, input
             eyes = list(EYES)
-            shuffle(eyes)  # TODO: this isn't as succesful as I hoped...
-            in_ = input(''.join(eyes) + ' ')
+            shuffle(eyes)  # TODO: this isn't as successful as I hoped...
+            if not in_:  # input buffer
+                try:
+                    in_ = input(''.join(eyes) + ' ')
+                except EOFError:
+                    running = False
             if in_:
-                p.value = ord(in_[0])
+                 p.value = ord(in_[0])
+                 in_ = in_[1:]
             else:
                 p.value = 0x0A  # newline
         elif c == 't':
@@ -50,24 +55,21 @@ def run(doors, p):
             p.dir = p.direction * -1
         elif c == 'S':  # seek!
             sleep(v)
-        elif c == 'f':  # figure, cond eq
-            if p.value != v:  # continue if equal, else jump to door v
-                ptr = v
+        elif c == 'f' and p.value != v:  # figure, cond eq
+             # continue if equal, else jump to door v
+             ptr = v
         elif c == 'g':  # guiding light
             p.value -= 1
         elif c == 'c':  # curious light
             p.value -= v
-        elif c == 'd':  # dupe , reverse of figure
-            if p.value == v:
-                ptr = v
+        elif c == 'd' and p.value == v:  # dupe , reverse of figure
+            ptr = v
         elif c == 'j':  # jack ... (jump?)
             ptr = p.value
         elif c == 'G':
             p.value = v
-            #print(f'Player value = {p.value}')
-
         if ptr < 1 or ptr > len(doors) or c == 'h':
-            running = False 
+            running = False
 
 
 def main():
