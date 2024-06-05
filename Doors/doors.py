@@ -88,7 +88,7 @@ def main():
     character = args.character
     doors = []  # list of numbered doors
     entities, values = source.split('\n')[:2]
-    #print(entities, values)
+    values = values.ljust(len(entities), ' ')
 
     i = 0
     for entity in entities:
