@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import argparse
-from math import sqrt
+#from math import sqrt
+from mpmath import mp, mpf, sqrt
+
 
 ABOUT = """
 Interpreter for esolang Conedy
@@ -22,7 +24,7 @@ The ip should get ever closer to y=4.5 without ever reaching it.
 TODO:
     * refactor down to simplify, and remove unncessary code / variables / classes
     * choose a better type for storing ips (need arbitrary precision rational)
-      now that the basic maths is correct
+      now that the basic maths is correct DONE: mpmath mpf
     * confirm the basic algorithm is really correct...
     * retain useful debugging (togglable), remove the noise
 """
@@ -51,8 +53,8 @@ class Net:
 
 class Ip:
     def __init__(self):
-        self.x = 0.5
-        self.y = 0.5
+        self.x = mpf(0.5)
+        self.y = mpf(0.5)
         self.target = None
 
     def __repr__(self):
@@ -94,17 +96,13 @@ class Field:
         print('Nets:', self.nets)
         print('Bounds:', self.bounds)
 
-    def run(self, limit=0):
+    def run(self):
         cnet = self.nets[0]
         self.ip.target = self.beacons[cnet.id.upper()]
         print(f'tick {self.ticks} {self.ip}')
         while self.ip.target:
             self.ticks += 1
-
             print(f'  Target beacon is: {self.ip.target}')
-            
-            # Next ip
-            # line from ip to beacon -- does it intersect a square?
             self.next_collision()
             print(f'tick {self.ticks} {self.ip}')
 
@@ -121,18 +119,18 @@ class Field:
     # via https://www.youtube.com/watch?v=NbSee-XM7WA
     def next_collision(self):
         # sets the next ip position, and next target beacon
-        # , or raise out of bounds
+        # , or set ip.target to None for out of bounds
         x = self.ip.x
         y = self.ip.y
         tx = self.ip.target.x
         ty = self.ip.target.y
         slope = (ty - y)/(tx - x)
+        assert isinstance(slope, mpf)
         ustepx = sqrt(1 + slope**2)
         ustepy = sqrt(1 + (1/slope)**2)
+        assert isinstance(ustepy, mpf)
         print('  SLOPE:', slope)
         print('  Unit Steps:', ustepx, ustepy)
-        #ustepx = slope
-        #ustepy = 1/slope
         pos = [int(x), int(y)]  # current checking pos
         lenx = 0
         leny = 0
@@ -164,7 +162,6 @@ class Field:
             if c and c == c.lower():
                 collided = True
                 self.ip.target = self.beacons[c.upper()]
-            # if pos = a net, collided = True
             if pos[0] < 0 or pos[1] < 0 or pos[0] > self.bounds[0] or pos[1] > self.bounds[1]:
                 # out of bounds!
                 print("IP has left the playfield!")
@@ -190,10 +187,13 @@ class Field:
 def main():
     parser = argparse.ArgumentParser(description=ABOUT, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('source', help='Source file to process', type=argparse.FileType('r'))
+    parser.add_argument('--precision', '-p', help='Precision (decimal places)', default=200, type=int)
     parser.add_argument('--debug', '-d', help='Turn on debug output', action='store_true')
     args = parser.parse_args()
 
+    mp.dps = args.precision
     field = Field(args.source)
+
     field.run()
 
 
