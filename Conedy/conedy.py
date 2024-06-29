@@ -124,10 +124,10 @@ class Field:
         y = self.ip.y
         tx = self.ip.target.x
         ty = self.ip.target.y
-        slope = (ty - y)/(tx - x)
-        assert isinstance(slope, mpf)
+        slope = mpf('inf') if tx == x else (ty - y)/(tx - x)
+        assert isinstance(slope, mpf), f'slope is {type(slope)}, expecting mpf'
         ustepx = sqrt(1 + slope**2)
-        ustepy = sqrt(1 + (1/slope)**2)
+        ustepy = mpf('inf') if slope == 0 else sqrt(1 + (1/slope)**2)
         assert isinstance(ustepy, mpf)
         print('  SLOPE:', slope)
         print('  Unit Steps:', ustepx, ustepy)
@@ -176,12 +176,12 @@ class Field:
         if (lenx - ustepx) > (leny - ustepy):
              # collision on x step
              self.ip.x = pos[0]
-             print(f'X collision: x={pos[0]}, at {collision}')
+             print(f'X collision: {pos}, at {collision}')
              self.ip.y = pos[0] * slope + y
         else:  # collsion on y step
              self.ip.y = pos[1]
-             print(f'Y collision: y={pos[1]}, at {collision}')
-             self.ip.x = pos[1] * (1/slope) + x
+             print(f'Y collision: {pos}, at {collision}')
+             self.ip.x = mpf(pos[0]) if slope == 0 else pos[1] * (1/slope) + x
 
 
 def main():
