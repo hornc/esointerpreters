@@ -12,3 +12,5 @@ Assorted esolang interpreters written by me for various languages on esolangs.or
 | [Seed](https://esolangs.org/wiki/Seed) | Xp(?) | 2009 | [seed.rb](Seed/) | 2021 |
 | [Barely](https://esolangs.org/wiki/Barely) | Calamari | 2006 | [barely.py](Barely/) | 2023 |
 | [Doors](https://esolangs.org/wiki/Doors) | BestCoder | 2024 | [doors.py](Doors/) | 2024 |
+| [Conedy](https://esolangs.org/wiki/Conedy) | ais523 | 2017 | [conedy.py](Conedy/) | 2024 |
+
