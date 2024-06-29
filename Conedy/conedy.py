@@ -171,7 +171,7 @@ class Field:
              self.ip.x = pos[0]
              print(f'  X collision: {pos}, at {collision}')
              self.ip.y = pos[0] * slope + y
-        else:  # collsion on y step
+        else:  # collision on y step
              self.ip.y = pos[1]
              print(f'  Y collision: {pos}, at {collision}')
              self.ip.x = mpf(pos[0]) if slope == 0 else pos[1] * (1/slope) + x
