@@ -34,7 +34,7 @@ class Beacon:
         self.y = y + 0.5
 
     def __repr__(self):
-        return f'{self.id} @ {self.x},{self.y}'
+        return f'{self.id} @ {self.x}, {self.y}'
 
 
 class Net:
@@ -42,9 +42,10 @@ class Net:
         self.id = id_
         self.x = x
         self.y = y
+        self.beacon = None
 
     def __repr__(self):
-        return f'{self.id} @ {self.x},{self.y}'
+        return f'{self.id} @ {self.x}, {self.y} ⤞ {self.beacon}'
 
 
 class Ip:
@@ -61,7 +62,7 @@ class Field:
     def __init__(self, source, debug=False):
         self.source = source.readlines()
         self.beacons = {}
-        self.nets = []  # TODO: .nets is not used, remove?
+        self.nets = {}
         self.ip = Ip()
         self.ticks = 0
         self.debug = debug
@@ -74,12 +75,15 @@ class Field:
                 if c.isupper():
                     self.beacons[c] = Beacon(c, x, y)
                 else:
-                    self.nets.append(Net(c, x, y))
+                    self.nets[c] = Net(c, x, y)
                 if x > xmax:
                     xmax = x
                 if y > ymax:
                     ymax = y
         self.bounds = [xmax, ymax]
+        # Associate all nets with the correct Beacon
+        for beacon in self.beacons:
+            self.nets[beacon.casefold()].beacon = beacon
         print('Beacons:', self.beacons)
         print('Nets:', self.nets)
         print('Bounds:', self.bounds)
@@ -144,9 +148,11 @@ class Field:
         collided = False
         while not collided:
             if lenx < leny:
+                step = 'X'
                 pos[0] += stepx
                 lenx += ustepx
             else:
+                step = 'Y'
                 pos[1] += stepy
                 leny += ustepy
             c = self.checkpos(*pos)
@@ -154,7 +160,7 @@ class Field:
                 print('Cell:', pos, c)
             if c and c == c.lower():
                 collided = True
-                self.ip.target = self.beacons[c.upper()]
+                self.ip.target = self.beacons[self.nets[c].beacon]
             if pos[0] < 0 or pos[1] < 0 or pos[0] > self.bounds[0] or pos[1] > self.bounds[1]:
                 # out of bounds!
                 collided = True
@@ -166,7 +172,7 @@ class Field:
         # x = 17.0
         collision = 'boundary' if self.ip.target is None else f'net {self.ip.target.id.lower()}'
         print(f'Event {self.ticks}:')
-        if (lenx - ustepx) > (leny - ustepy):
+        if step == 'X':
              # collision on x step
              self.ip.x = pos[0]
              print(f'  X collision: {pos}, at {collision}')
