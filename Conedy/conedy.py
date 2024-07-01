@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-#from math import sqrt
 from mpmath import mp, mpf, sqrt
 
 
@@ -158,7 +157,7 @@ class Field:
             c = self.checkpos(*pos)
             if self.debug:
                 print('Cell:', pos, c)
-            if c and c == c.lower():
+            if c and c.islower():
                 collided = True
                 self.ip.target = self.beacons[self.nets[c].beacon]
             if pos[0] < 0 or pos[1] < 0 or pos[0] > self.bounds[0] or pos[1] > self.bounds[1]:
@@ -170,7 +169,7 @@ class Field:
         # exit point: x = 17
         # y = 17 * 0.3125 + 0.5 = 5.8125 
         # x = 17.0
-        collision = 'boundary' if self.ip.target is None else f'net {self.ip.target.id.lower()}'
+        collision = 'boundary' if self.ip.target is None else f'net {self.ip.target.id.casefold()}'
         print(f'Event {self.ticks}:')
         if step == 'X':
              # collision on x step
