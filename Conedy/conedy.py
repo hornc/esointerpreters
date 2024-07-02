@@ -11,6 +11,8 @@ Language by ais523, 2017.
 This interpreter by Salpynx, 2024.
 """
 
+ENDIANNESS = 0  # 0 = little, 1 = big
+
 """
 Testing the question: Can a Conedy program
 enter an infinite loop which has it passing through
@@ -65,6 +67,8 @@ class Field:
         self.ip = Ip()
         self.ticks = 0
         self.debug = debug
+        self.byte_buffer = []
+        self.output_buffer = ''
         xmax = ymax = 0
         assert self.source[0][0].islower(), f'Expected top-left to be a net (lowercase). Got: {self.source[0][0]}'
         for y, line in enumerate(self.source):
@@ -72,9 +76,17 @@ class Field:
                 if not c.strip():
                     continue
                 if c.isupper():
-                    self.beacons[c] = Beacon(c, x, y)
+                    if c in self.beacons:
+                        assert not isinstance(self.beacons[c], tuple), f'ERROR: More than two Beacons: {c}!'
+                        self.beacons[c] = (self.beacons[c], Beacon(c, x, y))
+                    else:
+                        self.beacons[c] = Beacon(c, x, y)
                 else:
-                    self.nets[c] = Net(c, x, y)
+                    if c in self.nets:
+                        assert not isinstance(self.nets[c], tuple), f'ERROR: More than two Nets: {c}!'
+                        self.nets[c] = (self.nets[c], Net(c, x, y))
+                    else:
+                        self.nets[c] = Net(c, x, y)
                 if x > xmax:
                     xmax = x
                 if y > ymax:
@@ -82,15 +94,18 @@ class Field:
         self.bounds = [xmax, ymax]
         # Associate all nets with the correct Beacon
         for beacon in self.beacons:
-            self.nets[beacon.casefold()].beacon = beacon
+            n = beacon.casefold()
+            if isinstance(self.nets[n], tuple):
+                self.nets[n][0].beacon = self.nets[n][1].beacon = beacon
+            else:
+                self.nets[n].beacon = beacon
         print('Beacons:', self.beacons)
         print('Nets:', self.nets)
         print('Bounds:', self.bounds)
         print()
 
     def run(self):
-        beacon = self.source[0][0].upper()
-        self.ip.target = self.beacons[beacon]
+        self.set_target(self.source[0][0])
         print(f'Initial state = {self.ip}')
         while self.ip.target:
             self.ticks += 1
@@ -98,12 +113,42 @@ class Field:
             print(f'  {self.ip}')
             if self.ip.target is None:
                 print(f'IP has left the playfield at {self.ip}!')
+        if self.output_buffer:
+            print(self.output_buffer)
 
     def checkpos(self, x, y) -> str:
         try:
             return self.source[y][x].strip()
         except IndexError:
             return ''
+
+    def set_target(self, net:str, pos=(0, 0)):
+        net = net.casefold()
+        x, y = pos
+        if isinstance(self.nets[net], tuple):  # OUTPUT 1 bit!
+            a, b = self.nets[net]
+            bit = 0 if a.y == y and a.x == x else 1
+            self.output(bit)
+            beacon = self.beacons[a.beacon]
+        else:
+            beacon = self.beacons[self.nets[net].beacon]
+        if isinstance(beacon, tuple):  # INPUT 1 bit!
+            # TODO: add an option to accept bytestream input from STDIN
+            a, b = beacon
+            bit = ''
+            while not bit or bit not in '01':
+                bit = input(f"Enter '0' to head for {a} OR '1' to head for {b}: ")
+            beacon = beacon[int(bit)]
+        self.ip.target = beacon
+
+    def output(self, bit):
+        self.byte_buffer.append(bit)
+        b = ''.join([str(i) for i in self.byte_buffer])[::ENDIANNESS * 2 - 1]
+        if len(b) == 8:
+            c = chr(int(b, 2))
+            print('OUTPUT:', c)
+            self.output_buffer += c
+            self.byte_buffer = []
 
     def next_collision(self):
         """
@@ -141,9 +186,7 @@ class Field:
             stepy = 1
             leny = (pos[1] + 1 - y) * ustepy
         if self.debug:
-            print(f'  Initial lengths: {lenx}, {leny}')  # why can these be so large?
-               # Makes sense that the y unit step should be giant on a very shallow slope
-               # the alg. picks the _shortest_ length to travel, makes sense that the ignored one could be very large..
+            print(f'  Initial lengths: {lenx}, {leny}')
         collided = False
         while not collided:
             if lenx < leny:
@@ -159,7 +202,7 @@ class Field:
                 print('Cell:', pos, c)
             if c and c.islower():
                 collided = True
-                self.ip.target = self.beacons[self.nets[c].beacon]
+                self.set_target(c, pos)
             if pos[0] < 0 or pos[1] < 0 or pos[0] > self.bounds[0] or pos[1] > self.bounds[1]:
                 # out of bounds!
                 collided = True
@@ -169,7 +212,8 @@ class Field:
         # exit point: x = 17
         # y = 17 * 0.3125 + 0.5 = 5.8125 
         # x = 17.0
-        collision = 'boundary' if self.ip.target is None else f'net {self.ip.target.id.casefold()}'
+        target = self.ip.target
+        collision = 'boundary' if target is None else f'net {target.id.casefold()}'
         print(f'Event {self.ticks}:')
         if step == 'X':
              # collision on x step
