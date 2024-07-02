@@ -64,7 +64,7 @@ These could include:
 * Incorrect IO
 
 ## Usage examples
-A Hello World to demonstrate this *is* a programming language:
+A [Conedy Hello World](examples/hello-world.con) to demonstrate this *is* a programming language:
 
     ./conedy.py examples/hello-world.con
 
