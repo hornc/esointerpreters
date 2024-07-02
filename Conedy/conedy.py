@@ -132,9 +132,13 @@ class Field:
             beacon = self.beacons[a.beacon]
         else:
             beacon = self.beacons[self.nets[net].beacon]
-        if isinstance(beacon, tuple):
-            print('TODO: Get 1 bit of input to choose target!')
-            beacon = beacon[0]
+        if isinstance(beacon, tuple):  # INPUT 1 bit!
+            # TODO: add an option to accept bytestream input from STDIN
+            a, b = beacon
+            bit = ''
+            while not bit or bit not in '01':
+                bit = input(f"Enter '0' to head for {a} OR '1' to head for {b}: ")
+            beacon = beacon[int(bit)]
         self.ip.target = beacon
 
     def output(self, bit):
