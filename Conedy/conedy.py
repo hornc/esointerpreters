@@ -68,6 +68,7 @@ class Field:
         self.ticks = 0
         self.debug = debug
         self.byte_buffer = []
+        self.output_buffer = ''
         xmax = ymax = 0
         assert self.source[0][0].islower(), f'Expected top-left to be a net (lowercase). Got: {self.source[0][0]}'
         for y, line in enumerate(self.source):
@@ -112,6 +113,8 @@ class Field:
             print(f'  {self.ip}')
             if self.ip.target is None:
                 print(f'IP has left the playfield at {self.ip}!')
+        if self.output_buffer:
+            print(self.output_buffer)
 
     def checkpos(self, x, y) -> str:
         try:
@@ -138,7 +141,9 @@ class Field:
         self.byte_buffer.append(bit)
         b = ''.join([str(i) for i in self.byte_buffer])[::ENDIANNESS * 2 - 1]
         if len(b) == 8:
-            print('OUTPUT:', chr(int(b, 2)))
+            c = chr(int(b, 2))
+            print('OUTPUT:', c)
+            self.output_buffer += c
             self.byte_buffer = []
 
     def next_collision(self):
